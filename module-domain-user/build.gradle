@@ -1,0 +1,47 @@
+plugins{
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+
+}
+
+ext{
+    set( 'queryDslVersion' , '5.0.0')
+}
+
+bootJar {
+    enabled = false
+}
+jar{
+    enabled = true
+}
+
+dependencies {
+    implementation "com.querydsl:querydsl-jpa:5.0.0"
+    implementation "com.querydsl:querydsl-apt:5.0.0"
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    api project(":module-core")
+    test
+}
+
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets {
+    main.java.srcDir querydslDir
+}
+compileQuerydsl{
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+//querydsl 추가 끝
+

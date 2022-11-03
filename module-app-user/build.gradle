@@ -1,0 +1,7 @@
+dependencies {
+    api project(":module-core")
+    implementation project(":module-domain-user")
+    implementation project(":module-redis-user")
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
+}

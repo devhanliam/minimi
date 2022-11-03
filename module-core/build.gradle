@@ -1,0 +1,11 @@
+bootJar {
+    enabled = false
+}
+jar{
+    enabled = true
+}
+dependencies {
+    implementation group: 'com.mortennobel', name: 'java-image-scaling', version: '0.8.6'
+    implementation group: 'com.drewnoakes', name: 'metadata-extractor', version: '2.18.0'
+    implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+}

@@ -1,0 +1,192 @@
+
+plugins {
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.franzbecker.gradle-lombok' version '5.0.0'
+//    id 'java'
+    id 'java-library'
+    id 'idea'
+    id 'application'
+    id 'distribution'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+ext {
+//    set('springCloudVersion', '2021.0.1')
+    set('lombokVersion', '5.0.0')
+    set('querydslVersion', '5.0.0')
+//    set('awsJavaSdkVersion', '1.12.186')
+//    set('apacheCommonsVersion', '3.12.0')
+//    set('springdocOpenapiUIVersion', '1.6.6')
+    set('logbackVersion', '1.2.9')
+    set('mapStructVersion', '1.4.2.Final')
+    set( 'queryDslVersion' , '5.0.0')
+//    set('awsSecretManagerVersion', '2.4.1')
+}
+
+// querydsl 사용할 경로 지정합니다. 현재 지정한 부분은 .gitignore에 포함되므로 git에 올라가지 않습니다.
+def querydslDir = "$buildDir/generated/'querydsl'"
+
+// JPA 사용여부 및 사용 경로 설정
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+// build시 사용할 sourceSet 추가 설정
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+
+// querydsl 컴파일 시 사용할 옵션 설정
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+
+bootJar {
+    enabled = false
+}
+
+allprojects {
+    group = 'com.minimi'
+    version = '0.0.1'
+
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.spring.io/milestone" }
+        mavenCentral()
+    }
+
+}
+
+subprojects {
+//    apply plugin: 'java'
+    apply plugin: "java-library"
+    apply plugin: "io.franzbecker.gradle-lombok"
+    apply plugin: 'idea'
+    apply plugin: 'application'
+    apply plugin: 'distribution'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    configurations {
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+    }
+
+    plugins.withType(JavaPlugin) {
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
+        compileJava {
+            options.encoding = 'UTF-8'
+            options.compilerArgs << "-Xlint"
+        }
+//
+//        idea {
+//            module {
+//                outputDir = file("$buildDir/classes/main/")
+//                testOutputDir file("$buildDir/classes/test")
+//                downloadSources = true
+//            }
+//        }
+
+//        dependencyManagement {
+//            imports {
+//                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+//            }
+//        }
+
+        dependencies {
+
+            // for spring web
+            implementation('org.springframework.boot:spring-boot-starter-web') {
+                exclude module: 'spring-boot-starter-tomcat'
+            }
+            implementation('org.springframework.boot:spring-boot-starter-undertow')
+//            implementation 'org.springframework.boot:spring-boot-starter-webflux'
+//            implementation 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
+
+            //for Test
+//            implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+            // for security
+//            implementation 'org.springframework.boot:spring-boot-starter-security'
+//            implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//            implementation("io.jsonwebtoken:jjwt:0.9.1")
+
+            // for api
+//            implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+            // for project managing, monitoring
+//            implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//            implementation 'com.datadoghq:dd-trace-api:0.100.0'
+//            implementation 'io.opentracing:opentracing-util:0.33.0'
+
+            // for validation
+            implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+            // for database, cache
+            runtimeOnly 'com.h2database:h2'
+//            implementation 'mysql:mysql-connector-java:8.0.28'
+            implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//            implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//            implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+            // for aws
+//            implementation "io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:${awsSecretManagerVersion}"
+
+            // for apache commons
+//            implementation 'org.apache.commons:commons-lang3:3.12.0'
+//            implementation 'org.apache.commons:commons-collections4:4.4'
+//            implementation 'org.apache.commons:commons-pool2:2.11.1'
+
+            // for documentation
+//            implementation "org.springdoc:springdoc-openapi-ui:${springdocOpenapiUIVersion}"
+
+            // for google
+//            implementation 'com.google.guava:guava:31.1-jre'
+
+            // for logging
+//            implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+//            implementation "ch.qos.logback:logback-access:${logbackVersion}"
+//            implementation "ch.qos.logback:logback-core:${logbackVersion}"
+
+            // for kafka
+//            implementation 'org.springframework.kafka:spring-kafka'
+//            testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+            // for lombok
+            compileOnly 'org.projectlombok:lombok'
+            annotationProcessor 'org.projectlombok:lombok'
+
+            // for mapper : mapstruct는 반드시 lombok 이후에 선언되어야 함.
+            implementation "org.mapstruct:mapstruct:${mapStructVersion}"
+            annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
+
+            developmentOnly 'org.springframework.boot:spring-boot-devtools'
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//            testImplementation 'io.projectreactor:reactor-test'
+            testImplementation 'org.springframework.security:spring-security-test'
+
+            //for querydsl
+//            implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+//            implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+
+//            testImplementation 'com.drewnoakes:metadata-extractor:2.16.0'
+            testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+            testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+        }
+    }
+    test {
+        useJUnitPlatform()
+    }
+
+
+}
