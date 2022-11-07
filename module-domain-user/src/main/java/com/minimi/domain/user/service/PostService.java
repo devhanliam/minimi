@@ -16,6 +16,7 @@ import com.minimi.domain.user.request.CommentInsertForm;
 import com.minimi.domain.user.request.PostCreatForm;
 import com.minimi.domain.user.request.PostUpdateForm;
 import com.minimi.domain.user.response.CommentInfoForm;
+import com.minimi.domain.user.response.CommentLayeredForm;
 import com.minimi.domain.user.response.PostInfoForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,9 @@ public class PostService {
     }
 
     public PostInfoForm getPostInfo(Long boardId) {
-        List<CommentInfoForm> comments = commentRepository.findCommentByPostId(boardId);
+        List<Comment> commentByPostIdForEntity = commentRepository.findCommentByPostIdForEntity(boardId);
+        List<CommentLayeredForm> comments = CommentLayeredForm.entityToDto(commentByPostIdForEntity);
+//        List<CommentInfoForm> comments = commentRepository.findCommentByPostId(boardId);
         return postRepository.findPostById(boardId).map(info -> PostInfoForm.builder()
                 .postId(info.getId())
                 .writer(info.getWriter().getName())
@@ -139,12 +142,10 @@ public class PostService {
     }
 
     @Transactional
-    public Long createComment(CommentInsertForm commentInsertForm) {
-        User user =  userRepository.findByEmail(commentInsertForm.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
+    public Long createComment(CommentInsertForm commentInsertForm, User user) {
+
         Board board = postRepository.findById(commentInsertForm.getBoardId())
                 .orElseThrow(() -> new NotFoundBoardException());
-        commentInsertForm.setUserId(user.getId());
         Comment comment = Comment.builder()
                 .board(board)
                 .content(commentInsertForm.getContent())
@@ -154,13 +155,10 @@ public class PostService {
     }
 
     @Transactional
-    public Long createReComment(CommentInsertForm commentInsertForm) {
-        User user =  userRepository.findByEmail(commentInsertForm.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
+    public Long createReComment(CommentInsertForm commentInsertForm, User user) {
         Board board = postRepository.findById(commentInsertForm.getBoardId())
                 .orElseThrow(() -> new NotFoundBoardException());
         Comment parent = commentRepository.findById(commentInsertForm.getCommentId()).get();
-        commentInsertForm.setUserId(user.getId());
         Comment comment = Comment.builder()
                 .board(board)
                 .content(commentInsertForm.getContent())

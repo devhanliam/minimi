@@ -55,4 +55,21 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<Comment> findCommentByPostIdForEntity(Long postId) {
+        return queryFactory
+                .select(comment)
+                .from(comment)
+                .leftJoin(comment.parent)
+                .fetchJoin()
+                .innerJoin(comment.writer,user)
+                .fetchJoin()
+                .where(comment.board.id.eq(postId))
+                .orderBy(
+                        comment.parent.id.asc(),
+                        comment.createTime.asc()
+                )
+                .fetch();
+    }
+
 }

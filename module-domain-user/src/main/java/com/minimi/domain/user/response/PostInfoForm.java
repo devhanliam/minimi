@@ -24,5 +24,5 @@ public class PostInfoForm {
     private Long postId;
     private Long views;
     private List<BoardAttach> file;
-    private List<CommentInfoForm> commentList;
+    private List<CommentLayeredForm> commentList;
 }

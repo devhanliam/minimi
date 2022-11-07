@@ -31,7 +31,7 @@ public class  Comment extends BaseEntity{
     private Comment parent;
 
     @Builder.Default
-    @OneToMany(mappedBy = "parent",orphanRemoval = true)
+    @OneToMany(mappedBy = "parent")
     private List<Comment> children = new ArrayList<>();
 
     @JsonIgnore

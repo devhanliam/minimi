@@ -80,14 +80,16 @@ public class PostController {
     }
 
     @PostMapping("/api/v1/user/post/comment/create")
-    public ResponseEntity comment(@Valid @RequestBody CommentInsertForm commentInsertForm){
-        Long commentId = postService.createComment(commentInsertForm);
+    public ResponseEntity comment(@Valid @RequestBody CommentInsertForm commentInsertForm,HttpServletRequest request){
+        User user = getUserByToken(request);
+        Long commentId = postService.createComment(commentInsertForm,user);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentId);
     }
 
     @PostMapping("/api/v1/user/post/re-comment/create")
-    public ResponseEntity reComment(@Valid @RequestBody CommentInsertForm commentInsertForm) {
-        Long commentId = postService.createReComment(commentInsertForm);
+    public ResponseEntity reComment(@Valid @RequestBody CommentInsertForm commentInsertForm,HttpServletRequest request) {
+        User user = getUserByToken(request);
+        Long commentId = postService.createReComment(commentInsertForm,user);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentId);
     }
 

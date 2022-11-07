@@ -35,11 +35,11 @@ public class Board extends BaseEntity{
     private User writer;
 
     @Builder.Default
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board",cascade = {CascadeType.REMOVE})
     private List<Comment> commentList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "board",cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "board",cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private List<BoardAttach> attachList = new ArrayList<>();
 
     @Column(columnDefinition = "integer default 0",nullable = false)
