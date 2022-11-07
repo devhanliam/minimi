@@ -10,7 +10,6 @@ import {
     TextField,
     Toolbar
 } from "@material-ui/core";
-import Header from "./Header";
 import InfoForm from "./InfoForm";
 import {useParams} from "react-router-dom";
 import {callApi} from "./axiosUtils";
@@ -103,29 +102,60 @@ const PostInfo = () => {
                         <Container maxWidth="lg">
                             <InfoForm postInfo={postInfo} editFlag={editFlag} id={id}/>
                             <Divider/>
-                            <TextField
-                                        id="comment"
-                                        fullWidth
-                                        multiline
-                                        placeholder="공감의 이야기를 남겨주세요"
-                                        InputProps={{
-                                           startAdornment: (
-                                               <InputAdornment position="start">
-                                                   <Textsms />
-                                               </InputAdornment>
-                                           ),
-                                           endAdornment:(
-                                               <InputAdornment position="end">
-                                                   <Button color="primary" onClick={insertComment}>입력</Button>
-                                               </InputAdornment>
+                            {localStorage.getItem("email")?
+                                <TextField
+                                    id="comment"
+                                    fullWidth
+                                    multiline
+                                    placeholder="공감의 이야기를 남겨주세요"
+                                    InputProps={{
 
-                                           )
-                                       }}
-                                       variant="standard"
-                            />
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Textsms />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment:(
+                                            <InputAdornment position="end">
+                                                <Button color="primary" onClick={insertComment}>입력</Button>
+                                            </InputAdornment>
+
+                                        )
+                                    }}
+                                    variant="standard"
+                                />
+
+                                :
+
+                                <TextField
+                                    id="comment"
+
+                                    fullWidth
+                                    multiline
+                                    placeholder="로그인 후 이야기를 나눠보세요"
+                                    InputProps={{
+                                        readOnly : true,
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Textsms />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment:(
+                                            <InputAdornment position="end">
+                                                <Button color="primary" onClick={()=>{window.location.href="/login"}}>로그인</Button>
+                                            </InputAdornment>
+
+                                        )
+                                    }}
+                                    variant="standard"
+                                />
+
+                            }
+
                             {
-                               commentList.map((c,idx)=>(
-                                    <Comment key={idx} comment={c}/>
+                               commentList.map((c)=>(
+                                    <Comment key={c.id} id={c.id} comment={c} setCommentList={setCommentList}/>
+
                                 ))
                             }
                         </Container>

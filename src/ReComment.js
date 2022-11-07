@@ -1,13 +1,13 @@
-import {Avatar, Button, Grid, InputAdornment, Paper, TextField, Typography} from "@material-ui/core";
-import React, {Fragment, useRef, useState} from "react";
+import Comment from "./Comment";
+import {Avatar, Box, Button, Divider, Grid, InputAdornment, Paper, TextField, Typography} from "@material-ui/core";
 import {Textsms} from "@material-ui/icons";
+import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {callApi} from "./axiosUtils";
-import ReComment from "./ReComment";
 
-const Comment = (props)=>{
-    const [displayFlag, setDisplayFlag] = useState(false);
+const ReComment = (props) =>{
     const {comment} = props;
+    const [displayFlag, setDisplayFlag] = useState(false);
     const {id} = useParams();
     const insertComment = ()=>{
         let content = document.querySelector('#reply' + props.id);
@@ -36,8 +36,10 @@ const Comment = (props)=>{
             });
 
     }
-    return(
-        <Paper style={{padding:"40px 20px",marginTop:10}}>
+    return (
+        <Box style={{marginLeft:10}}>
+            <Divider/>
+            <br/>
             <Grid container wrap="nowrap" spacing={2}>
                 <Grid item>
                     <Avatar>{comment.nickName}</Avatar>
@@ -101,14 +103,15 @@ const Comment = (props)=>{
                     }
                 </Grid>
             </Grid>
-    {
-        comment.children.map(c =>
-            <ReComment key={c.id} id={c.id} comment={c} setCommentList={props.setCommentList}/>
-        )
-    }
-        </Paper>
+            {
+                comment.children.map(c =>
+                    <ReComment key={c.id} id={c.id} comment={c} setCommentList={props.setCommentList}/>
+                )
+            }
+        </Box>
+
 
     );
-}
 
-export default Comment;
+}
+export default ReComment

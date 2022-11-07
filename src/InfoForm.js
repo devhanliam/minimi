@@ -15,6 +15,7 @@ const InfoForm = (props) => {
             callApi(`/api/v1/user/post/delete/${props.id}`,'post')
                 .then(res=>{
                     alert("삭제 되었습니다");
+                    window.location.href = "/";
                 })
                 .catch(err => {
                     alert("삭제 실패했습니다");
@@ -23,8 +24,8 @@ const InfoForm = (props) => {
         }
     }
     const actions = [
-        { icon: <EditSharp color="primary" onClick={moveUpdate}/>, name: '수정' },
-        { icon: <Delete color="secondary" onClick={deletePost}/>, name: '삭제' },
+        { icon: <EditSharp color="primary"/>, name: '수정',onClick:moveUpdate },
+        { icon: <Delete color="secondary"/>, name: '삭제',onClick:deletePost },
 
     ];
 
@@ -103,6 +104,7 @@ const InfoForm = (props) => {
                                 key={action.name}
                                 icon={action.icon}
                                 tooltipTitle={action.name}
+                                onClick={action.onClick}
                             />
                         ))}
                     </SpeedDial>
