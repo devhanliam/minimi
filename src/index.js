@@ -10,6 +10,7 @@ import PostEdit from "./PostEdit";
 import PostInfo from "./PostInfo";
 import Header from "./Header";
 import PostUpdate from "./PostUpdate";
+import MyPost from "./MyPost";
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ root.render(
           <Routes>
               <Route path="/post" element={<PostEdit/>}/>
               <Route path="/post/:id" element={<PostInfo/>}/>
+              <Route path="/post/my/list" element={<MyPost/>}/>
               <Route path="/post/update/:id" element={<PostUpdate/>}/>
               <Route path="/login" element={<Login />}/>
               <Route path="/join" element={<Join />}/>

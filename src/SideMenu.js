@@ -2,7 +2,25 @@ import {Fragment, useState} from "react";
 import {Box, Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 import {AccountCircle, Home, ListAlt} from "@material-ui/icons";
 
-const SideMenu = () => {
+const SideMenu = (props) => {
+    let isLogin = localStorage.getItem("email") ? true : false;
+    const myInfoClick = () => {
+        if (isLogin) {
+            window.location.href = "/user"
+        }else{
+            props.setIsLoginModalOpen(true);
+        }
+
+    }
+
+    const myPostClick = () => {
+        if (isLogin) {
+            window.location.href = "/post/my/list"
+        }else{
+            props.setIsLoginModalOpen(true);
+        }
+
+    }
  return(
      <Box
          style={{width:250}}
@@ -19,7 +37,7 @@ const SideMenu = () => {
              </ListItem>
              <Divider/>
              <ListItem>
-                 <IconButton>
+                 <IconButton onClick={myInfoClick}>
                      <ListItemIcon>
                          <AccountCircle/>
                      </ListItemIcon>
@@ -27,7 +45,7 @@ const SideMenu = () => {
                  </IconButton>
              </ListItem>
              <ListItem>
-                 <IconButton>
+                 <IconButton onClick={myPostClick}>
                      <ListItemIcon>
                          <ListAlt/>
                      </ListItemIcon>

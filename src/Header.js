@@ -62,7 +62,6 @@ const Header = () => {
     <CssBaseline/>
     <AppBar position="fixed">
         <Toolbar>
-
                     <IconButton
                         size="medium"
                         edge="start"
@@ -125,7 +124,7 @@ const Header = () => {
             open={sideMenuFlag}
             onClose={()=>{setSideMenuFlag(false)}}
         >
-            <SideMenu/>
+            <SideMenu setIsLoginModalOpen={setIsLoginModalOpen}/>
         </Drawer>
       <Dialog open={isLoginModalOpen}
         onClose={()=>{setIsLoginModalOpen(false)}}
