@@ -1,7 +1,7 @@
 package com.minimi.domain.user.response;
 
 import com.minimi.domain.user.entity.Comment;
-import com.minimi.domain.user.helper.EntityCovertLayeredFormHelper;
+import com.minimi.core.helper.EntityCovertLayeredFormHelper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

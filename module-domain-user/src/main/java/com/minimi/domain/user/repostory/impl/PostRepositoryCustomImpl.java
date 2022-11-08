@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
+import static com.minimi.domain.user.entity.QBoard.board;
 import static com.minimi.domain.user.entity.QComment.*;
 import static com.minimi.domain.user.entity.QUser.*;
 
@@ -19,23 +20,23 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public List<Board> findPostList(boolean openFlag) {
-        return queryFactory.selectFrom(QBoard.board)
-                .where(QBoard.board.openFlag.eq(openFlag))
-                .innerJoin(QBoard.board.writer, user)
+        return queryFactory.selectFrom(board)
+                .where(board.openFlag.eq(openFlag))
+                .innerJoin(board.writer, user)
                 .fetchJoin()
-                .leftJoin(QBoard.board.attachList, QBoardAttach.boardAttach)
+                .leftJoin(board.attachList, QBoardAttach.boardAttach)
                 .fetchJoin()
-                .orderBy(QBoard.board.id.desc())
+                .orderBy(board.id.desc())
                 .fetch();
     }
 
     @Override
     public Optional<Board> findPostById(Long postId) {
-        return Optional.ofNullable(queryFactory.selectFrom(QBoard.board)
-                .where(QBoard.board.id.eq(postId))
-                .innerJoin(QBoard.board.writer, user)
+        return Optional.ofNullable(queryFactory.selectFrom(board)
+                .where(board.id.eq(postId))
+                .innerJoin(board.writer, user)
                 .fetchJoin()
-                .leftJoin(QBoard.board.attachList, QBoardAttach.boardAttach)
+                .leftJoin(board.attachList, QBoardAttach.boardAttach)
                 .fetchJoin()
 //                .leftJoin(QBoard.board.commentList, QComment.comment)
 //                .fetchJoin()
@@ -70,6 +71,18 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         comment.createTime.asc()
                 )
                 .fetch();
+    }
+
+    @Override
+    public List<Board> findPostListByUser(User user) {
+        return queryFactory
+                .selectFrom(board)
+                .where(board.writer.eq(user))
+                .orderBy(
+                        board.id.desc()
+                )
+                .fetch();
+
     }
 
 }

@@ -47,6 +47,13 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(postList);
     }
 
+    @GetMapping("/api/v1/user/post/list")
+    public ResponseEntity getMyPostList(HttpServletRequest request) {
+        User user = getUserByToken(request);
+        List<PostInfoForm> postList= postService.getMyPostList(user);
+        return ResponseEntity.status(HttpStatus.OK).body(postList);
+    }
+
     @GetMapping("/api/v1/post/info/{boardId}")
     public ResponseEntity getPostInfo(@PathVariable(name = "boardId")Long boardId, HttpServletRequest request, HttpServletResponse response) {
         PostInfoForm postInfo = postService.getPostInfo(boardId);

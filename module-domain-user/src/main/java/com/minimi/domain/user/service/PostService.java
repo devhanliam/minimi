@@ -15,7 +15,6 @@ import com.minimi.domain.user.repostory.UserRepository;
 import com.minimi.domain.user.request.CommentInsertForm;
 import com.minimi.domain.user.request.PostCreatForm;
 import com.minimi.domain.user.request.PostUpdateForm;
-import com.minimi.domain.user.response.CommentInfoForm;
 import com.minimi.domain.user.response.CommentLayeredForm;
 import com.minimi.domain.user.response.PostInfoForm;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -189,5 +186,10 @@ public class PostService {
         }else{
             throw new NotFoundUserException();
         }
+    }
+
+    public List<PostInfoForm> getMyPostList(User user) {
+        List<Board> boardList = postRepository.findPostListByUser(user);
+        return PostInfoForm.entitiesToFormForList(boardList);
     }
 }

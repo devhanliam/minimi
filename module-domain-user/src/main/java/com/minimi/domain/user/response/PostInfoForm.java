@@ -1,13 +1,13 @@
 package com.minimi.domain.user.response;
 
+import com.minimi.domain.user.entity.Board;
 import com.minimi.domain.user.entity.BoardAttach;
-import com.minimi.domain.user.entity.Comment;
+import com.minimi.core.helper.EntityCovertFormHelper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -23,6 +23,21 @@ public class PostInfoForm {
     private boolean openFlag;
     private Long postId;
     private Long views;
+    private String open;
     private List<BoardAttach> file;
     private List<CommentLayeredForm> commentList;
+
+    public static List<PostInfoForm> entitiesToFormForList(List<Board> entities) {
+        EntityCovertFormHelper entityCovertFormHelper = EntityCovertFormHelper.newInstanceForList(entities,
+                e -> PostInfoForm.builder()
+                        .title(e.getTitle())
+                        .postId(e.getId())
+                        .views(e.getViews())
+                        .content(e.getContent())
+                        .writeTime(e.getCreateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                        .open(e.isOpenFlag() ? "공개" : "비공개")
+                        .build()
+        );
+        return entityCovertFormHelper.convertList();
+    }
 }

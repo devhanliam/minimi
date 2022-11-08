@@ -1,4 +1,4 @@
-package com.minimi.domain.user.helper;
+package com.minimi.core.helper;
 
 import java.util.ArrayList;
 import java.util.HashMap;

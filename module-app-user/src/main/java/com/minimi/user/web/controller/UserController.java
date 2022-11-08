@@ -1,12 +1,16 @@
 package com.minimi.user.web.controller;
 
+import com.minimi.domain.user.entity.User;
 import com.minimi.domain.user.exception.ExpiredTokenException;
+import com.minimi.domain.user.exception.NotFoundUserException;
 import com.minimi.domain.user.repostory.UserRepository;
 import com.minimi.domain.user.request.DuplicationForm;
 import com.minimi.domain.user.response.LoginResponse;
+import com.minimi.domain.user.response.UserInfoForm;
 import com.minimi.domain.user.service.UserService;
 import com.minimi.domain.user.request.JoinForm;
 import com.minimi.domain.user.request.LoginForm;
+import com.minimi.user.jwt.JwtTokenProvider;
 import com.minimi.user.service.JwtUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtUserService jwtUserService;
+    private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/api/v1/login")
     public ResponseEntity login(@Valid @RequestBody LoginForm loginForm, HttpServletResponse response){
@@ -69,6 +74,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
+    @GetMapping("/api/v1/user/info")
+    public ResponseEntity info(HttpServletRequest request) {
+        User user = getUserByToken(request);
+        UserInfoForm userInfoForm = UserInfoForm.entityToForm(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userInfoForm);
+    }
+
     private Cookie getSecureCookie(LoginResponse token) {
         Cookie cookie = new Cookie("refreshToken", token.getRefreshToken());
         cookie.setMaxAge(7 * 24 * 60 * 60);
@@ -78,5 +90,11 @@ public class UserController {
         //운영단계에서는 SSL 적용 후 true
         cookie.setSecure(false);
         return cookie;
+    }
+    private User getUserByToken(HttpServletRequest request) {
+        String token = tokenProvider.resolveToken(request).orElseThrow(ExpiredTokenException::new);
+        User user =  userRepository.findByEmail(tokenProvider.getUserId(token))
+                .orElseThrow(()->new NotFoundUserException());
+        return user;
     }
 }
