@@ -1,20 +1,18 @@
-import {Box, Container, CssBaseline, Grid, Toolbar} from "@material-ui/core";
-import Post from "./Post";
+import {Box, Container, CssBaseline, Toolbar} from "@material-ui/core";
 import MyPostForm from "./MyPostForm";
+import UserInfoForm from "./UserInfoForm";
 
-const MyPost = ()=>{
+const UserInfo = () => {
     return(
         <Box sx={{}} maxWidth="lg">
             <CssBaseline/>
             <Toolbar/>
             {/*<Header/>*/}
             <main>
-                <Box component='main'
-
-                >
+                <Box component='main'>
                     <Toolbar/>
-                    <Container maxWidth="lg">
-                        <MyPostForm/>
+                    <Container maxWidth="md">
+                        <UserInfoForm/>
                     </Container>
                 </Box>
             </main>
@@ -23,5 +21,4 @@ const MyPost = ()=>{
 
 
 }
-
-export default MyPost;
+export default UserInfo;

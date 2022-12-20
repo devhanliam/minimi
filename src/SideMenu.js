@@ -6,7 +6,7 @@ const SideMenu = (props) => {
     let isLogin = localStorage.getItem("email") ? true : false;
     const myInfoClick = () => {
         if (isLogin) {
-            window.location.href = "/user"
+            window.location.href = "/user/info"
         }else{
             props.setIsLoginModalOpen(true);
         }

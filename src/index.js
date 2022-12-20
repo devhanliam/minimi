@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
@@ -11,9 +11,10 @@ import PostInfo from "./PostInfo";
 import Header from "./Header";
 import PostUpdate from "./PostUpdate";
 import MyPost from "./MyPost";
+import UserInfo from "./UserInfo";
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+    <Fragment>
       <Header/>
       <BrowserRouter>
           <Routes>
@@ -21,12 +22,13 @@ root.render(
               <Route path="/post/:id" element={<PostInfo/>}/>
               <Route path="/post/my/list" element={<MyPost/>}/>
               <Route path="/post/update/:id" element={<PostUpdate/>}/>
+              <Route path="/user/info" element={<UserInfo/>}/>
               <Route path="/login" element={<Login />}/>
               <Route path="/join" element={<Join />}/>
               <Route path="/" element={<Main />}/>
           </Routes>
       </BrowserRouter>
-  </React.StrictMode>
+    </Fragment>
 );
 
 // If you want to start measuring performance in your app, pass a function

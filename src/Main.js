@@ -8,15 +8,23 @@ import Header from "./Header";
 import Post from "./Post";
 import {useEffect, useState} from "react";
 import {callApi, IMG_SRC_HOST} from "./axiosUtils";
+import {useInView} from "react-intersection-observer";
 
 const Main = () => {
     const [postList,setPostList] = useState([]);
-    useEffect(()=>{
-        callApi("/api/v1/post/list","get",null)
+    const [ref, inView] = useInView();
+    const [cursorId, setCursorId] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [renderFlag, setRenderFlag] = useState(true);
+    const [listSize, setListSize] = useState(0)
+    const getPostList = () => {
+        let param = cursorId ? `?cursorId=${cursorId}`:'';
+        setLoading(true);
+        callApi(`/api/v1/post/list${param}`,"get",null)
             .then(function (response){
-                console.log(response);
-                let data = response.data;
+                let data = response.data.postInfoFormList;
                 let postData = [];
+                    console.log(data);
                 if (Array.isArray(data)) {
                     for (let i = 0; i < data.length; i++) {
                         let postInfo = {
@@ -33,11 +41,33 @@ const Main = () => {
                         postData[i] = postInfo;
                     }
                 }
-                setPostList(postData);
+
+                setListSize(postData.length);
+                setPostList(prevState => [...prevState,...postData]);
+                setCursorId(response.data.cursorId);
+            })
+            .catch(error => {
+
+
             });
-    },[]);
+        setLoading(false)
+    }
+
+
+    useEffect(()=>{
+        if(renderFlag){
+            getPostList();
+        }
+        setRenderFlag(false);
+    },[renderFlag]);
+
+    useEffect(()=>{
+        if (listSize > 0 && inView && !loading) {
+            setRenderFlag(true);
+        }
+    },[inView])
     return (
-        <Box sx={{display:'flex'}} maxWidth="lg">
+        <Box sx={{}} maxWidth="lg">
             <CssBaseline/>
             {/*<Header/>*/}
             <main>
@@ -51,9 +81,10 @@ const Main = () => {
                     <Toolbar/>
                     <Container maxWidth="lg">
                         <Grid container spacing={2}>
-                            {postList.map((p,idx) => (
-                                <Post key={idx} post={p}/>
+                            {postList.map((p,idx,) => (
+                                        <Post key={p.id} post={p}/>
                             ))}
+                            <div ref={ref} />
                         </Grid>
                     </Container>
                 </Box>

@@ -177,7 +177,7 @@ const EditForm = () => {
                 <Grid item>
                     <Typography style={{padding: 8}}>비공개</Typography>
                 </Grid>
-                <Grid item>
+                <Grid item style={{marginTop:11}}>
                     <AntSwitch defaultChecked
                                id="openFlag"
                                inputProps={{ 'aria-label': 'ant design'

@@ -15,9 +15,10 @@ import {
     Typography
 } from "@material-ui/core";
 import {LockOutlined} from "@material-ui/icons";
-import {useState} from "react";
+import React, {useState} from "react";
 import {REG_TYPE, validReg} from "./validUtil";
 import {callApi} from "./axiosUtils";
+import LoadingBackDrop from "./LoadingBackDrop";
 
 const theme = createTheme();
 const Join = () => {
@@ -25,6 +26,9 @@ const Join = () => {
     const [emailValid, setEmailValid] = useState({error: false, msg : "이메일을 입력해 주세요",type : REG_TYPE.EMAIL});
     const [passwordValid, setPasswordValid] = useState({error: false, msg: "비밀번호를 한번더 입력해주세요", type: REG_TYPE.EMAIL});
     const [duplicationCheck, setDuplicationCheck] = useState(false);
+    const [encAuthCode, setEncAuthCode] = useState("");
+    const [authCodeCheck, setAuthCodeCheck] = useState(false);
+    const [backDropFlag, setBackDropFlag] = useState(false);
     const validCheck = (e) => {
         let value = e.target.value;
         setEmail(value);
@@ -65,6 +69,11 @@ const Join = () => {
                 , msg: "이메일을 입력해주세요"
                 , type : REG_TYPE.EMAIL
             });
+            return;
+        }
+
+        if (!authCodeCheck) {
+            alert("메일인증을 완료해 주세요");
             return;
         }
 
@@ -115,6 +124,7 @@ const Join = () => {
             return;
         }
         let params = {email : email.value};
+        setBackDropFlag(true);
         callApi("/api/v1/join/duplication-check","post",params)
             .then((response)=>{
                 setEmailValid({
@@ -123,7 +133,10 @@ const Join = () => {
                     , type : REG_TYPE.EMAIL
                 });
                 setDuplicationCheck(true);
-
+                let encAuthCode = document.querySelector("#encAuthCode")
+                setEncAuthCode(response.data);
+                alert("압력하신 메일로 인증코드가 발송되었습니다.\n" +
+                    "인증코드를 입력해주세요");
             })
             .catch((error)=>{
                 if(Array.isArray(error.response.data)){
@@ -134,14 +147,41 @@ const Join = () => {
                     alert(error.response.data.message);
                 }
             })
+        setBackDropFlag(false);
 
     }
 
+    function checkAuthCode() {
+        let authCode = document.querySelector("#authCode").value;
+        let email = document.querySelector("#email").value;
+        let param = {
+            "authCode" : authCode,
+            "encAuthCode": encAuthCode,
+            "email":email
+        }
+        callApi("/api/v1/join/auth-code-check","post",param)
+            .then(res => {
+                setAuthCodeCheck(true);
+                alert("인증이 완료되었습니다");
+        })
+            .catch(error => {
+                setAuthCodeCheck(false);
+                if(Array.isArray(error.response.data)){
+                    for (let i = 0; i < error.response.data.length; i++) {
+                        alert(error.response.data[i].message);
+                    }
+                }else{
+                    alert(error.response.data.message);
+                }
+            })
+    }
     return (
         <ThemeProvider theme={theme}>
+        {/*<input hidden id="encAuthCode" value=""/>*/}
             <Toolbar/>
             <Container component="main" maxWidth="xs">
                 <CssBaseline/>
+                <LoadingBackDrop open={backDropFlag}/>
                 <Box sx={{
                     marginTop: 8,
                     display: 'flex',
@@ -208,6 +248,30 @@ const Join = () => {
                                     onClick={checkDuplication}
                                 >
                                     이메일 중복확인
+                                </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="authCode"
+                                    name="authCode"
+                                    label="인증번호"
+                                    onChange={(e) =>{e.target.value=e.target.value
+                                        .replace(/[^0-9.]/g, '')
+                                        .replace(/(\..*)\./g, '$1')}}
+                                    helperText="메일로 발송된 인증코드 6자리를 입력해주세요"
+                                    inputProps={{ maxLength: 6 }}
+                                />
+                                <Button
+                                    size="medium"
+                                    variant="contained"
+                                    sx={{mt:3,mb:2}}
+                                    color="primary"
+                                    onClick={checkAuthCode}
+                                >
+                                    인증확인
                                 </Button>
                             </Grid>
                             {/*<Grid item xs={3}>*/}

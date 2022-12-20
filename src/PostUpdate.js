@@ -7,7 +7,7 @@ const PostUpdate = () => {
     return(
         <Fragment>
             <Toolbar/>
-            <Box sx={{display:'flex'}} maxWidth="lg">
+            <Box sx={{}} maxWidth="lg">
                 {/*<Header/>*/}
                 <CssBaseline/>
                 <main>

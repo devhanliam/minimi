@@ -175,7 +175,12 @@ const UpdateForm = ()=>{
             {/*        </Tooltip>*/}
             {/*        : null*/}
             {/*}*/}
-            <TextField fullWidth variant="outlined" label="제목" id="title" name="title" style={{marginTop:10, marginBottom:10}}/>
+            <TextField fullWidth
+                       variant="outlined"
+                       label="제목"
+                       id="title"
+                       name="title"
+                       style={{marginTop:10, marginBottom:10}}/>
             <Editor
                 ref={textRef}
                 placeholder="인상깊은 하루를 기록하세요."
@@ -192,7 +197,7 @@ const UpdateForm = ()=>{
                 <Grid item>
                     <Typography style={{padding: 8}}>비공개</Typography>
                 </Grid>
-                <Grid item>
+                <Grid item style={{marginTop:11}}>
                     <AntSwitch defaultChecked
                                id="openFlag"
                                inputProps={{ 'aria-label': 'ant design'
