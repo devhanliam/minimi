@@ -151,3 +151,4 @@ replay_pid*
 /module-redis-user/build/
 /module-app-admin/build/
 /.idea/
+/module-core/src/main/resources/

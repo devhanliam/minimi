@@ -11,6 +11,7 @@ import com.minimi.domain.user.repostory.UserRepository;
 import com.minimi.domain.user.request.CommentInsertForm;
 import com.minimi.domain.user.request.PostCreatForm;
 import com.minimi.domain.user.request.PostUpdateForm;
+import com.minimi.domain.user.response.PostInfoForPaging;
 import com.minimi.domain.user.response.PostInfoForm;
 import com.minimi.domain.user.service.PostService;
 import com.minimi.user.jwt.JwtTokenProvider;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,15 +45,16 @@ public class PostController {
     private final PostRepository postRepository;
 
     @GetMapping("/api/v1/post/list")
-    public ResponseEntity getPostList(){
-        List<PostInfoForm> postList = postService.getPostList();
-        return ResponseEntity.status(HttpStatus.OK).body(postList);
+    public ResponseEntity getPostList(Long cursorId,
+                                      @PageableDefault(size = 12) Pageable pageable){
+        PostInfoForPaging postInfoForPaging = postService.getPostListForPage(cursorId,pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(postInfoForPaging);
     }
 
     @GetMapping("/api/v1/user/post/list")
     public ResponseEntity getMyPostList(HttpServletRequest request) {
         User user = getUserByToken(request);
-        List<PostInfoForm> postList= postService.getMyPostList(user);
+        List<PostInfoForm> postList = postService.getMyPostList(user);
         return ResponseEntity.status(HttpStatus.OK).body(postList);
     }
 

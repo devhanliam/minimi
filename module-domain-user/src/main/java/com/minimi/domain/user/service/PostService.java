@@ -16,9 +16,11 @@ import com.minimi.domain.user.request.CommentInsertForm;
 import com.minimi.domain.user.request.PostCreatForm;
 import com.minimi.domain.user.request.PostUpdateForm;
 import com.minimi.domain.user.response.CommentLayeredForm;
+import com.minimi.domain.user.response.PostInfoForPaging;
 import com.minimi.domain.user.response.PostInfoForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +57,19 @@ public class PostService {
                         .build())
                 .collect(Collectors.toList());
         return postFormList;
+    }
+
+    public PostInfoForPaging getPostListForPage(Long cursorId, Pageable pageable) {
+        List<PostInfoForm> postInfoForms = PostInfoForm.entitiesToFormForList(
+                postRepository.findPostListForPaging(cursorId, pageable));
+        Long nowCursorId =
+                postInfoForms.size() > 0 ?
+                postInfoForms.get(postInfoForms.size() - 1).getPostId() :
+                cursorId;
+        return PostInfoForPaging.builder()
+                .postInfoFormList(postInfoForms)
+                .cursorId(nowCursorId)
+                .build();
     }
 
     @Transactional
@@ -192,4 +207,5 @@ public class PostService {
         List<Board> boardList = postRepository.findPostListByUser(user);
         return PostInfoForm.entitiesToFormForList(boardList);
     }
+
 }

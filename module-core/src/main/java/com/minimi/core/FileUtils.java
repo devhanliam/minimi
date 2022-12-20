@@ -48,9 +48,6 @@ public class FileUtils {
                 getFileExt(file.getOriginalFilename()).replaceAll("\\.",""),
                 saveDir);
         log.info("FILE RESIZING RESULT============== : {}",result);
-//        InputStream is = file.getInputStream();
-//        Files.copy(is, saveDir.toPath());
-//        file.transferTo(saveDir);
         return randomName;
     }
 

@@ -1,4 +1,16 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    username: 1hanho94@gmail.com
+    password: yurrwwwvnufdsfhb
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
   servlet:
     multipart:
       location: /Users/han/temp

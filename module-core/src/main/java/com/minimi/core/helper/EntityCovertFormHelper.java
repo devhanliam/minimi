@@ -38,8 +38,7 @@ public class EntityCovertFormHelper<E,F> {
     }
 
     private F convertInternal() {
-        F form = toForm(entity);
-        return form;
+        return toForm(entity);
     }
 
     private List<F> convertListInternal() {

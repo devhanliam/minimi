@@ -4,8 +4,10 @@ import com.minimi.domain.user.entity.*;
 import com.minimi.domain.user.repostory.PostRepositoryCustom;
 import com.minimi.domain.user.response.CommentInfoForm;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +85,27 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 )
                 .fetch();
 
+    }
+
+    @Override
+    public List<Board> findPostListForPaging(Long cursorId, Pageable pageable) {
+        return queryFactory.selectFrom(board)
+                .where(
+                        board.openFlag.eq(true),
+                        ltCursorId(cursorId)
+
+                )
+                .innerJoin(board.writer, user)
+                .fetchJoin()
+                .leftJoin(board.attachList, QBoardAttach.boardAttach)
+                .fetchJoin()
+                .limit(pageable.getPageSize())
+                .orderBy(board.id.desc())
+                .fetch();
+    }
+
+    private BooleanExpression ltCursorId(Long cursorId) {
+        return cursorId == null ? null : board.id.lt(cursorId);
     }
 
 }

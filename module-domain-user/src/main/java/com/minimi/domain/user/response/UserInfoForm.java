@@ -30,7 +30,6 @@ public class UserInfoForm {
                         user.getCreateTime()
                 ));
         return (UserInfoForm) entityCovertFormHelper.convert();
-
     }
 
 }

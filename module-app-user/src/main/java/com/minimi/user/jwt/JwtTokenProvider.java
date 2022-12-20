@@ -99,7 +99,7 @@ public class JwtTokenProvider {
                     setSigningKey(secretKey)
                     .parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
             log.info("validationToken 에러");
             log.info(jwtToken);
             e.printStackTrace();
