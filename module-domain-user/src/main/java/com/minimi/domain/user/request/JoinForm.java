@@ -1,11 +1,13 @@
 package com.minimi.domain.user.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Data
+@NoArgsConstructor
 public class JoinForm {
 
     @NotEmpty(message = "이름은 필수 입력 사항입니다")

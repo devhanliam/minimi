@@ -26,7 +26,7 @@ public class MultiPartConfig {
         File tempDir = new File(fileTempDir);
         if(!tempDir.exists()){
             boolean mkdirsSuccess = tempDir.mkdirs();
-            log.info("mkdirsSuccess : {}",mkdirsSuccess);
+            log.info("mkdirs is Success : {}",mkdirsSuccess);
         }
         factory.setLocation(fileTempDir);
         return factory.createMultipartConfig();

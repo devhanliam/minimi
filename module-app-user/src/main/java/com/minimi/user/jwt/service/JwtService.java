@@ -1,15 +1,12 @@
-package com.minimi.user.jwt;
+package com.minimi.user.jwt.service;
 
-import com.minimi.domain.user.exception.ExpiredTokenException;
 import com.minimi.user.redis.RedisService;
+import com.minimi.user.security.exception.ExpiredTokenException;
 import com.minimi.user.service.CustomUserDetailService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -20,11 +17,12 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class JwtTokenProvider {
+public class JwtService {
     private String secretKey = "scrkey";
     private final static long ACCESS_VALID_TIME = 30 * 60 * 1000L; // 30m
     private final static long REFRESH_VALID_TIME = 1000L * 60 * 60 * 24;  // 24h
@@ -51,30 +49,49 @@ public class JwtTokenProvider {
     }
 
     public String createAccessToken(String userId, List<String> roles) {
-        return this.createToken(userId,roles,ACCESS_VALID_TIME);
+        return this.createToken(userId, roles, ACCESS_VALID_TIME);
     }
 
     public String createRefreshToken(String userId, List<String> roles) {
         String token = this.createToken(userId, roles, REFRESH_VALID_TIME);
-        redisService.setValues(userId,token, Duration.ofMillis(REFRESH_VALID_TIME));
+        redisService.setValues(userId, token, Duration.ofMillis(REFRESH_VALID_TIME));
         return token;
     }
 
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserId(token));
-        userDetails.getAuthorities().stream().forEach(a -> log.info(a.getAuthority()));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
+//    public Authentication getAuthentication(String token) {
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserId(token));
+//        userDetails.getAuthorities().stream().forEach(a -> log.info(a.getAuthority()));
+//        return new JwtAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+//    }
 
     public String getUserId(String token) {
         try {
-        String userId = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-        return userId;
-        }catch (ExpiredJwtException ex){
+            String userId = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+            return userId;
+        } catch (ExpiredJwtException ex) {
+            ex.printStackTrace();
+            throw new ExpiredTokenException();
+        }
+    }
+
+
+    public List<SimpleGrantedAuthority> getRoles(String token) {
+        try {
+            Object roles = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("roles");
+            List<String> list = (List<String>) roles;
+            List<SimpleGrantedAuthority> authorities = list.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+            return authorities;
+        } catch (ExpiredJwtException ex) {
             ex.printStackTrace();
             throw new ExpiredTokenException();
         }
@@ -84,14 +101,14 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return Optional.of(bearerToken.substring(7));
-        }else{
+        } else {
             throw new ExpiredTokenException();
         }
     }
 
     public boolean validateToken(String jwtToken) {
         try {
-            if(redisService.getValues(jwtToken) != null){
+            if (redisService.getValues(jwtToken) != null) {
                 return false;
             }
             Jws<Claims> claims = Jwts
@@ -113,7 +130,7 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getExpiration();
-        Long expiredTime = expiration.getTime() -  new Date().getTime();
+        Long expiredTime = expiration.getTime() - new Date().getTime();
         return expiredTime;
     }
 }

@@ -1,16 +1,17 @@
 package com.minimi.user.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minimi.user.jwt.JwtTokenProvider;
 import com.minimi.user.jwt.filter.JwtAuthenticationFilter;
+import com.minimi.user.jwt.provider.JwtAuthenticationProvider;
+import com.minimi.user.jwt.service.JwtService;
+import com.minimi.user.security.exception.hanlder.AccessDeniedHandler;
+import com.minimi.user.security.exception.hanlder.AuthenticationExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,10 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfig{
-    private final JwtTokenProvider jwtTokenProvider;
+public class WebSecurityConfig {
+    private final JwtService jwtService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,8 +43,10 @@ public class WebSecurityConfig{
                 .cors().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
-//                .exceptionHandling()
-
+                .exceptionHandling()
+                .authenticationEntryPoint(new AuthenticationExceptionHandler())
+                .accessDeniedHandler(new AccessDeniedHandler())
+                .and()
 //                .and()
 //                .headers()
 //                .frameOptions()
@@ -52,24 +56,31 @@ public class WebSecurityConfig{
                 .anonymous()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/user/**").hasRole("USER")
+                .mvcMatchers("/api/v1/user/**").hasRole("USER")
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-                ;
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+        ;
         return http.build();
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtService);
+        return new ProviderManager(jwtAuthenticationProvider);
+    }
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         return (web) -> web.ignoring()
 //                .antMatchers(HttpMethod.OPTIONS,"/**")
 //                .antMatchers("/")
-                .antMatchers("/api/v1/login")
-                .antMatchers("/api/v1/logout")
-                .antMatchers("/api/v1/re-issue")
-                .antMatchers("/api/v1/join/**")
-                .antMatchers("/api/v1/post/**")
-                .antMatchers("/api/v1/post/image/**")
-                .antMatchers("/h2-console/**");
+//                .mvcMatchers("/api/v1/login")
+//                .mvcMatchers("/api/v1/logout")
+//                .mvcMatchers("/api/v1/re-issue")
+//                .mvcMatchers("/api/v1/join/**")
+//                .mvcMatchers("/api/v1/post/**")
+//                .mvcMatchers("/api/v1/post/image/**")
+                .mvcMatchers("/h2-console/**");
     }
 }

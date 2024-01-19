@@ -1,29 +1,30 @@
 package com.minimi.user.web.controller;
 
 import com.minimi.domain.user.entity.User;
-import com.minimi.domain.user.exception.ExpiredTokenException;
 import com.minimi.domain.user.exception.NotFoundUserException;
 import com.minimi.domain.user.exception.NotMatchPasswordException;
 import com.minimi.domain.user.repostory.UserRepository;
 import com.minimi.domain.user.request.DuplicationForm;
+import com.minimi.domain.user.request.JoinForm;
+import com.minimi.domain.user.request.LoginForm;
 import com.minimi.domain.user.request.MailCertifyForm;
 import com.minimi.domain.user.response.LoginResponse;
 import com.minimi.domain.user.response.UserInfoForm;
 import com.minimi.domain.user.service.UserService;
-import com.minimi.domain.user.request.JoinForm;
-import com.minimi.domain.user.request.LoginForm;
-import com.minimi.user.jwt.JwtTokenProvider;
+import com.minimi.user.jwt.service.JwtService;
 import com.minimi.user.mail.MailService;
+import com.minimi.user.security.exception.ExpiredTokenException;
 import com.minimi.user.service.JwtUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.expression.ExpressionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -31,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import static com.minimi.user.jwt.JwtTokenProvider.AUTHORIZATION_HEADER;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,11 +40,12 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtUserService jwtUserService;
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService tokenProvider;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
+
     @PostMapping("/api/v1/login")
-    public ResponseEntity login(@Valid @RequestBody LoginForm loginForm, HttpServletResponse response){
+    public ResponseEntity login(@Valid @RequestBody LoginForm loginForm, HttpServletResponse response) {
         LoginResponse token = jwtUserService.login(loginForm.getEmail(), loginForm.getPassword());
         Cookie cookie = getSecureCookie(token);
         response.addCookie(cookie);
@@ -53,14 +54,14 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/logout")
-    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response){
-        jwtUserService.logout(request,response);
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) {
+        jwtUserService.logout(request, response);
         return ResponseEntity.ok(null);
     }
 
 
     @PostMapping("/api/v1/re-issue")
-    public ResponseEntity reIssue(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity reIssue(HttpServletRequest request, HttpServletResponse response) {
         LoginResponse token = jwtUserService.reissue(request);
         Cookie cookie = getSecureCookie(token);
         response.addCookie(cookie);
@@ -78,7 +79,7 @@ public class UserController {
                     .build());
             return ResponseEntity.status(HttpStatus.OK).body(encryptAuthCode);
         }
-            return ResponseEntity.status(HttpStatus.OK).body(false);
+        return ResponseEntity.status(HttpStatus.OK).body(false);
 
     }
 
@@ -118,10 +119,11 @@ public class UserController {
         cookie.setSecure(false);
         return cookie;
     }
+
     private User getUserByToken(HttpServletRequest request) {
         String token = tokenProvider.resolveToken(request).orElseThrow(ExpiredTokenException::new);
-        User user =  userRepository.findByEmail(tokenProvider.getUserId(token))
-                .orElseThrow(()->new NotFoundUserException());
+        User user = userRepository.findByEmail(tokenProvider.getUserId(token))
+                .orElseThrow(() -> new NotFoundUserException());
         return user;
     }
 }

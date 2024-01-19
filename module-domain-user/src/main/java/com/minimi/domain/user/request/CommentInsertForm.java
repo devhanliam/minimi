@@ -1,11 +1,13 @@
 package com.minimi.domain.user.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 public class CommentInsertForm {
     @NotNull(message = "게시글 일련번호가 누락되었습니다")
     Long boardId;

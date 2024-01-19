@@ -53,15 +53,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorForm, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ExpiredTokenException.class)
-    protected ResponseEntity<ErrorForm> handleExpiredTokenException(ExpiredTokenException ex) {
-        ErrorForm errorForm = ErrorForm.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message(ex.getMessage())
-                .errorCode(ErrorCode.EXPIRED_TOKEN.getCode())
-                .build();
-        return new ResponseEntity<>(errorForm, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(ExpiredTokenException.class)
+//    protected ResponseEntity<ErrorForm> handleExpiredTokenException(ExpiredTokenException ex) {
+//        ErrorForm errorForm = ErrorForm.builder()
+//                .statusCode(HttpStatus.OK.value())
+//                .message(ex.getMessage())
+//                .errorCode(ErrorCode.EXPIRED_TOKEN.getCode())
+//                .build();
+//        return new ResponseEntity<>(errorForm, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(FileException.class)
     protected ResponseEntity<ErrorForm> handleFileException(FileException ex) {
@@ -72,6 +72,7 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(errorForm, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(NotFoundBoardException.class)
     protected ResponseEntity<ErrorForm> handleNotFoundBoardException(NotFoundBoardException ex) {
         ErrorForm errorForm = ErrorForm.builder()
@@ -85,7 +86,7 @@ public class GlobalExceptionHandler {
     protected List<ErrorForm> getErrorForms(BindingResult bindingResult) {
         List<ErrorForm> errors = new ArrayList<>();
         bindingResult.getAllErrors()
-                .forEach(objectError->{
+                .forEach(objectError -> {
                     errors.add(
                             ErrorForm.builder()
                                     .statusCode(HttpStatus.BAD_REQUEST.value())

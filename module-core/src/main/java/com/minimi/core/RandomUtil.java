@@ -4,8 +4,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
-public class RandomUtil {
-    public static String generateRandomNumber(int length) {
+@Component
+public final class RandomUtil {
+    public String generateRandomNumber(final int length) {
         Random random = new Random();
         int createNum = 0;
         String ranNum = "";

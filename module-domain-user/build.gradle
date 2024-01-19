@@ -19,6 +19,7 @@ dependencies {
     implementation "com.querydsl:querydsl-apt:5.0.0"
     implementation 'org.springframework.boot:spring-boot-starter-security'
     api project(":module-core")
+    implementation 'org.projectlombok:lombok:1.18.22'
 }
 
 

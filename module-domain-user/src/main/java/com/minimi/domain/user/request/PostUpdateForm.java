@@ -1,11 +1,13 @@
 package com.minimi.domain.user.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 public class PostUpdateForm {
     @NotNull(message = "게시글 정보를 가져올 수 없습니다.")
     private Long id;
