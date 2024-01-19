@@ -57,7 +57,6 @@ const Login = () => {
         }
         callApi("api/v1/login","post",params)
             .then(function (response) {
-                console.log(`Bearer ${response.data.accessToken}`);
                 localStorage.setItem("accessToken", response.data.accessToken);
                 localStorage.setItem("name", response.data.name);
                 localStorage.setItem("nickName", response.data.nickName);
